@@ -4,15 +4,16 @@ import './index.css';
 import { NextUIProvider } from '@nextui-org/react';
 import AppRouter from './routes/router.tsx';
 import { BrowserRouter } from 'react-router-dom';
+import { ElectoralDataContextProvider } from './hooks/useElectoralData/index.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <NextUIProvider>
-            <BrowserRouter>
-                <main className="dark text-foreground bg-background w-screen h-screen">
+        <BrowserRouter>
+            <NextUIProvider>
+                <ElectoralDataContextProvider>
                     <AppRouter />
-                </main>
-            </BrowserRouter>
-        </NextUIProvider>
+                </ElectoralDataContextProvider>
+            </NextUIProvider>
+        </BrowserRouter>
     </React.StrictMode>
 );
