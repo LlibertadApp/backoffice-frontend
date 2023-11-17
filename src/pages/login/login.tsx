@@ -51,7 +51,7 @@ export const LoginPage = () => {
               name="email"
               className="mt-1 p-2 border rounded-md"
             />
-            <ErrorMessage name="email" component="p" className="text-red-500 text-sm" />
+            <ErrorMessage name="email" component="p" className="text-red-500 text-sm pt-2" />
           </div>
           <div className="flex flex-col mb-4">
             <label htmlFor="password" className="text-sm font-medium text-gray-400">
@@ -63,7 +63,7 @@ export const LoginPage = () => {
               name="password"
               className="mt-1 p-2 border rounded-md"
             />
-            <ErrorMessage name="password" component="p" className="text-red-500 text-sm" />
+            <ErrorMessage name="password" component="p" className="text-red-500 text-sm pt-4" />
           </div>
           <Button type="submit" className="bg-[#646cff]">
             Ingresar
