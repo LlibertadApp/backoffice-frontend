@@ -5,16 +5,16 @@ import NewFiscal from '../pages/new-fiscal';
 import EditFiscal from '../pages/editar-fiscal';
 
 const AppRouter = () => {
-    return (
-        <Routes>
-            <Route path="" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/new-fiscal" element={<NewFiscal />} />
-            <Route path="/edit-fiscal" element={<EditFiscal />} />
+  return (
+    <Routes>
+      <Route path="" element={<Login />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/new-fiscal" element={<NewFiscal />} />
+      <Route path="/edit-fiscal" element={<EditFiscal />} />
 
-            <Route path="*" element={<div>404 Not found</div>} />
-        </Routes>
-    );
+      <Route path="*" element={<div>404 Not found</div>} />
+    </Routes>
+  );
 };
 
 export default AppRouter;

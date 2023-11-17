@@ -2,7 +2,7 @@
 
     export const Navbar = () => {
         return (
-            <div className="bg-black text-white">
+            <div className="bg-neutral-950 text-white">
                 <div className="container mx-auto p-4">
                     <div className="flex items-center justify-between">
                         <a href="/dashboard" className="px-4 text-xs-lg font-semibold tracking-widest p-4">
