@@ -1,5 +1,5 @@
 import { Input, Button, Autocomplete, AutocompleteItem } from '@nextui-org/react';
-import { Link } from 'react-router-dom';
+import { Link} from 'react-router-dom';
 import {
     getDistritos,
     getElectoralSectionsByDistritoId,
@@ -23,6 +23,7 @@ const EditarFiscal = () => {
     const [circuits, setCircuits] = useState<Circuit[]>([]);
     const [establishment, setEstablishment] = useState<KeyOrNull>(null);
     const [establishments, setEstablishments] = useState<Establishment[]>([]);
+
 
     const districts = useMemo(() => {
         return getDistritos();
@@ -86,6 +87,10 @@ const EditarFiscal = () => {
     console.log('circuit', circuit);
     console.log('establishment', establishment);
 
+    const EditFiscal = () => {
+        console.log('fiscal editadoo')
+    };
+
     return (
         <div className='justify-center'>
 
@@ -98,7 +103,7 @@ const EditarFiscal = () => {
                         </p>
                 </div>
 
-        <div className="px-20 container pt-4">
+        <div className="px-8 container pt-4">
             <div className="w-150 flex flex-col gap-4  ">
                 <span className='text-lg font-bold pt-4'>Datos Electorales</span>
                 <Autocomplete
@@ -158,7 +163,7 @@ const EditarFiscal = () => {
                 <Input type="email" label="Email" className="max-w-sm" />
                 <Input type="text" label="Telefono" className="max-w-sm" />
                 <Link to="/dashboard" className="max-w-sm">
-                    <Button type="button" color="secondary" className='w-full'>
+                    <Button type="button" color="secondary" className='w-full' onClick={() => (EditFiscal)}>
                         Editar Fiscal
                     </Button>
                 </Link>
