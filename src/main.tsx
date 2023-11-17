@@ -7,12 +7,12 @@ import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <NextUIProvider>
-            <BrowserRouter>
+        <BrowserRouter>
+            <NextUIProvider>
                 <main className="dark text-foreground bg-background w-screen h-screen">
                     <AppRouter />
                 </main>
-            </BrowserRouter>
-        </NextUIProvider>
+            </NextUIProvider>
+        </BrowserRouter>
     </React.StrictMode>
 );
