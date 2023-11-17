@@ -1,25 +1,84 @@
 import { Input, Button, Autocomplete, AutocompleteItem } from '@nextui-org/react';
-import { useElectoralData } from '../../hooks/useElectoralData';
 import { Link } from 'react-router-dom';
+import {
+    getDistritos,
+    getElectoralSectionsByDistritoId,
+    getSectionsByElectoralSectionId,
+    getCircuitBySectionId,
+    getEstablishmentByCircuitId,
+} from './helpers';
+
+import { ElectoralSection, Section, Circuit, Establishment } from '../../entities/ElectoralData';
+import { Key, useEffect, useMemo, useState } from 'react';
+
+type KeyOrNull = Key | null;
 
 const NewFiscal = () => {
-    const {
-        district,
-        districts,
-        districtOnSelectionChange,
-        section,
-        sections,
-        sectionOnSelectionChange,
-        electoralSection,
-        electoralSections,
-        electoralSectionOnSelectionChange,
-        circuit,
-        circuits,
-        circuitOnSelectionChange,
-        establishment,
-        establishments,
-        establishmentOnSelectionChange,
-    } = useElectoralData();
+    const [district, setDistrict] = useState<KeyOrNull>(null);
+    const [electoralSections, setElectoralSections] = useState<ElectoralSection[]>([]);
+    const [electoralSection, setElectoralSection] = useState<KeyOrNull>(null);
+    const [section, setSection] = useState<KeyOrNull>(null);
+    const [sections, setSections] = useState<Section[]>([]);
+    const [circuit, setCircuit] = useState<KeyOrNull>(null);
+    const [circuits, setCircuits] = useState<Circuit[]>([]);
+    const [establishment, setEstablishment] = useState<KeyOrNull>(null);
+    const [establishments, setEstablishments] = useState<Establishment[]>([]);
+
+    const districts = useMemo(() => {
+        return getDistritos();
+    }, []);
+
+    const districtOnSelectionChange = (distrito_id: Key) => {
+        setDistrict(distrito_id);
+    };
+
+    useEffect(() => {
+        if (district) {
+            setElectoralSections(getElectoralSectionsByDistritoId(district));
+        } else {
+            setElectoralSections([]);
+        }
+    }, [district]);
+
+    const electoralSectionOnSelectionChange = (seccionprovincial_id: Key) => {
+        setElectoralSection(seccionprovincial_id);
+    };
+
+    useEffect(() => {
+        if (electoralSection) {
+            setSections(getSectionsByElectoralSectionId(electoralSection));
+        } else {
+            setSections([]);
+        }
+    }, [electoralSection]);
+
+    const sectionOnSelectionChange = (seccion_id: Key) => {
+        setSection(seccion_id);
+    };
+
+    useEffect(() => {
+        if (section) {
+            setCircuits(getCircuitBySectionId(section));
+        } else {
+            setCircuits([]);
+        }
+    }, [section]);
+
+    const circuitOnSelectionChange = (circuito_id: Key) => {
+        setCircuit(circuito_id);
+    };
+
+    useEffect(() => {
+        if (circuit) {
+            setEstablishments(getEstablishmentByCircuitId(circuit));
+        } else {
+            setEstablishments([]);
+        }
+    }, [circuit]);
+
+    const establishmentOnSelectionChange = (id_colegio: Key) => {
+        setEstablishment(id_colegio);
+    };
 
     console.log('district', district);
     console.log('electoralSection', electoralSection);
