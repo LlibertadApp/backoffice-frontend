@@ -22,7 +22,6 @@ import { dummyFiscales } from './data';
 import { Fiscal } from '../../entities/Fiscal';
 import { PlusIcon } from '../../assets/PlusIcon';
 import { SearchIcon } from '../../assets/SearchIcon';
-import { Navbar } from '../../components/Navbar/Navbar';
 
 const columns = [
     { name: 'Nombre Completo', uid: 'fullName' },
@@ -66,7 +65,7 @@ const Dashboard = () => {
                 );
             case 'actions':
                 return (
-                    <div className="relative flex items-center gap-2">
+                    <div className="relative flex items-center gap-4">
                         <Snippet symbol="" codeString={fiscal.magicLink}>
                             Copiar Link
                         </Snippet>

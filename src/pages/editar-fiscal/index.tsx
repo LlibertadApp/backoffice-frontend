@@ -7,7 +7,7 @@ import {
     getCircuitBySectionId,
     getEstablishmentByCircuitId,
 } from './helpers';
-
+import { Navbar } from '../../components/Navbar/Navbar';
 import { ElectoralSection, Section, Circuit, Establishment } from '../../entities/ElectoralData';
 import { Key, useEffect, useMemo, useState } from 'react';
 
@@ -76,7 +76,7 @@ const EditarFiscal = () => {
         }
     }, [circuit]);
 
-    const establishmentOnSelectionChange = (id_colegio: Key) => {
+    const establishmentOnSelectionChange = (id_colegio: Key) => {   
         setEstablishment(id_colegio);
     };
 
@@ -87,9 +87,20 @@ const EditarFiscal = () => {
     console.log('establishment', establishment);
 
     return (
-        <div className="w-full flex flex-row  ">
-            <div className="w-1/2 flex flex-col gap-4 ">
-                <span>Datos Electorales</span>
+        <div className='justify-center'>
+
+            <Navbar />
+
+            
+            <div className='text-xl items-center px-20 pt-2'>
+                    <p className='text-bold text-3xl'>
+                        Editando Fiscal
+                        </p>
+                </div>
+
+        <div className="px-20 container pt-4">
+            <div className="w-150 flex flex-col gap-4  ">
+                <span className='text-lg font-bold pt-4'>Datos Electorales</span>
                 <Autocomplete
                     onSelectionChange={districtOnSelectionChange}
                     defaultItems={districts}
@@ -105,7 +116,7 @@ const EditarFiscal = () => {
                     label="Seccion Electoral"
                     placeholder="Busca una SeccionElectoral"
                     className="max-w-sm"
-                >
+                    >
                     {(electoralSection) => (
                         <AutocompleteItem key={electoralSection.seccionprovincial_id}>
                             {electoralSection.seccionprovincial_nombre ?? 'Primera'}
@@ -127,7 +138,7 @@ const EditarFiscal = () => {
                     label="Circuito "
                     placeholder="Busca un Circuito"
                     className="max-w-sm"
-                >
+                    >
                     {(circuit) => <AutocompleteItem key={circuit.circuito_id}>{circuit.circuito_nombre ?? 'Primera'}</AutocompleteItem>}
                 </Autocomplete>
                 <Autocomplete
@@ -141,18 +152,19 @@ const EditarFiscal = () => {
                 </Autocomplete>
             </div>
 
-            <div className=" w-1/2 flex flex-col gap-4 ">
-                <span>Datos del Fiscal</span>
+            <div className="w-120 flex flex-col gap-4 pt-4">
+                <span className="text-lg font-bold">Datos del Fiscal</span>
                 <Input type="text" label="Nombre Completo" className="max-w-sm " />
                 <Input type="email" label="Email" className="max-w-sm" />
                 <Input type="text" label="Telefono" className="max-w-sm" />
                 <Link to="/dashboard" className="max-w-sm">
-                    <Button type="button" color="primary">
+                    <Button type="button" color="secondary" className='w-full'>
                         Editar Fiscal
                     </Button>
                 </Link>
             </div>
         </div>
+                    </div>
     );
 };
 
