@@ -25,7 +25,7 @@ export const LoginPage = () => {
 
   return (
     <div className="px-4 mx-auto flex flex-col items-center max-w-md bg-neutral-950">
-      <img src="../../../public/fenix-new.svg" alt="fenix" className="object-cover h-auto w-28 mb-10 mt-24 pt-12" />
+      <img src="/fenix-new.svg" alt="fenix" className="object-cover h-auto w-28 mb-10 mt-24 pt-12" />
       <h1 className="text-[32px] font-light text-center whitespace-pre-line">
         Entre todos, <br />
         <strong className="text-violet-brand font-semibold break-words">evitemos el fraude.</strong>
