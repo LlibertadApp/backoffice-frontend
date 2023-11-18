@@ -1,22 +1,18 @@
 import { Input, Button, Autocomplete, AutocompleteItem } from '@nextui-org/react';
-// import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 import {
-  getDistritos,
-  getElectoralSectionsByDistritoId,
+  getCircuitsBySectionId,
+  getElectoralSectionsFromDistritoObject,
+  getEstablishmentsByCircuitObject,
+  getMesasByEstablishmentId,
   getSectionsByElectoralSectionId,
-  getCircuitBySectionId,
-  getEstablishmentByCircuitId,
 } from './helpers';
 
 import { Navbar } from '../../components/Navbar/Navbar';
 
-// import { ElectoralSection, Section, Circuit, Establishment } from '../../entities/ElectoralData';
-// import { Key, useEffect, useMemo, useState } from 'react';
-// type KeyOrNull = Key | null;
-
-import { Key, useEffect, useMemo } from 'react';
+import { distritos, getCircuitoById, getDistritoById } from '../../services/mesas';
+import { Key, useCallback, useEffect, useState } from 'react';
 
 import { useFiscal } from '../../context/FiscalContext';
 
@@ -40,76 +36,140 @@ const NewFiscal = () => {
     setEstablishment,
     establishments,
     setEstablishments,
+    setDistritoCompleteObject,
+    distritoCompleteObject,
+    circuitCompleteObject,
+    setCircuitCompleteObject,
+    tables,
+    setTables,
   } = useFiscal();
-  
+
   const navigate = useNavigate();
+  const [error, setError] = useState(false);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     navigate('/dashboard');
   };
 
-  const districts = useMemo(() => {
-    return getDistritos();
-  }, []);
-
   const districtOnSelectionChange = (distrito_id: Key) => {
-    setDistrict(distrito_id);
+    setDistrict((prev) => {
+      if (prev !== distrito_id) {
+        setDistritoCompleteObject(null);
+        setElectoralSection(null);
+        setSection(null);
+        setCircuit(null);
+        setCircuitCompleteObject(null);
+        setEstablishment(null);
+      }
+      return distrito_id;
+    });
   };
+
+  const getDistrictData = useCallback(async (districtID: Key) => {
+    try {
+      const distritoCompleteObject = await getDistritoById(districtID);
+      setDistritoCompleteObject(distritoCompleteObject);
+      setElectoralSections(getElectoralSectionsFromDistritoObject(distritoCompleteObject));
+    } catch (error) {
+      setError(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (district) {
-      setElectoralSections(getElectoralSectionsByDistritoId(district));
+      getDistrictData(district);
     } else {
       setElectoralSections([]);
     }
-  }, [district]);
+  }, [district, getDistrictData]);
 
   const electoralSectionOnSelectionChange = (seccionprovincial_id: Key) => {
-    setElectoralSection(seccionprovincial_id);
+    setElectoralSection((prev) => {
+      if (prev !== seccionprovincial_id) {
+        setSection(null);
+        setCircuit(null);
+        setCircuitCompleteObject(null);
+        setEstablishment(null);
+      }
+      return seccionprovincial_id;
+    });
   };
 
   useEffect(() => {
-    if (electoralSection) {
-      setSections(getSectionsByElectoralSectionId(electoralSection));
+    if (distritoCompleteObject && electoralSection) {
+      setSections(getSectionsByElectoralSectionId(distritoCompleteObject, electoralSection));
     } else {
       setSections([]);
     }
-  }, [electoralSection]);
+  }, [electoralSection, distritoCompleteObject]);
 
   const sectionOnSelectionChange = (seccion_id: Key) => {
-    setSection(seccion_id);
+    setSection((prev) => {
+      if (prev !== seccion_id) {
+        setCircuit(null);
+        setCircuitCompleteObject(null);
+        setEstablishment(null);
+      }
+      return seccion_id;
+    });
   };
 
   useEffect(() => {
-    if (section) {
-      setCircuits(getCircuitBySectionId(section));
+    if (section && distritoCompleteObject && electoralSection) {
+      setCircuits(getCircuitsBySectionId(distritoCompleteObject, electoralSection, section));
     } else {
       setCircuits([]);
     }
-  }, [section]);
+  }, [section, electoralSection, distritoCompleteObject]);
 
   const circuitOnSelectionChange = (circuito_id: Key) => {
-    setCircuit(circuito_id);
+    setCircuit((prev) => {
+      if (prev !== circuito_id) {
+        setCircuitCompleteObject(null);
+        setEstablishment(null);
+      }
+      return circuito_id;
+    });
   };
 
+  const getCircuitData = useCallback(async (district: Key, electoralSection: Key, section: Key, circuit: Key) => {
+    try {
+      const circuitData = await getCircuitoById(district, electoralSection, section, circuit);
+      setCircuitCompleteObject(circuitData);
+      setEstablishments(getEstablishmentsByCircuitObject(circuitData));
+    } catch (error) {
+      setError(true);
+    }
+  }, []);
+
   useEffect(() => {
-    if (circuit) {
-      setEstablishments(getEstablishmentByCircuitId(circuit));
+    if (circuit && district && electoralSection && section && circuit) {
+      getCircuitData(district, electoralSection, section, circuit);
     } else {
       setEstablishments([]);
     }
-  }, [circuit]);
+  }, [circuit, section, electoralSection, district]);
 
   const establishmentOnSelectionChange = (id_colegio: Key) => {
     setEstablishment(id_colegio);
   };
 
+  useEffect(() => {
+    if (establishment && circuitCompleteObject) {
+      setTables(getMesasByEstablishmentId(circuitCompleteObject, establishment));
+    } else {
+      setTables([]);
+    }
+  }, [establishment]);
+
   console.log('district', district);
   console.log('electoralSection', electoralSection);
-  console.log('section', section);
+  console.log('sections', sections);
   console.log('circuit', circuit);
   console.log('establishment', establishment);
+  console.log('error', error);
+  console.log('tables', tables);
 
   return (
     <div>
@@ -118,14 +178,13 @@ const NewFiscal = () => {
         <div className="w-150 flex flex-col gap-4 items-center">
           <span className="text-lg font-bold pt-4">Datos Electorales</span>
           <Autocomplete
-            selectedKey={String(district)}
             onSelectionChange={districtOnSelectionChange}
-            defaultItems={districts}
+            defaultItems={Object.entries(distritos).map(([key, value]) => ({ id: key, value }))}
             label="Distrito"
             placeholder="Busca un Distrito"
             className="max-w-sm"
           >
-            {(district) => <AutocompleteItem key={district.distrito_id}>{district.distrito_nombre}</AutocompleteItem>}
+            {(district) => <AutocompleteItem key={district.id}>{district.value}</AutocompleteItem>}
           </Autocomplete>
           <Autocomplete
             onSelectionChange={electoralSectionOnSelectionChange}
@@ -134,11 +193,7 @@ const NewFiscal = () => {
             placeholder="Busca una SeccionElectoral"
             className="max-w-sm"
           >
-            {(electoralSection) => (
-              <AutocompleteItem key={electoralSection.seccionprovincial_id}>
-                {electoralSection.seccionprovincial_nombre ?? 'Primera'}
-              </AutocompleteItem>
-            )}
+            {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value ?? 'Primera'}</AutocompleteItem>}
           </Autocomplete>
           <Autocomplete
             onSelectionChange={sectionOnSelectionChange}
@@ -147,7 +202,7 @@ const NewFiscal = () => {
             placeholder="Busca una Seccion"
             className="max-w-sm"
           >
-            {(section) => <AutocompleteItem key={section.seccion_id}>{section.seccion_nombre ?? 'Primera'}</AutocompleteItem>}
+            {(section) => <AutocompleteItem key={section.id}>{section.value ?? 'Primera'}</AutocompleteItem>}
           </Autocomplete>
           <Autocomplete
             onSelectionChange={circuitOnSelectionChange}
@@ -156,7 +211,7 @@ const NewFiscal = () => {
             placeholder="Busca un Circuito"
             className="max-w-sm"
           >
-            {(circuit) => <AutocompleteItem key={circuit.circuito_id}>{circuit.circuito_nombre ?? 'Primera'}</AutocompleteItem>}
+            {(circuit) => <AutocompleteItem key={circuit.id}>{circuit.value ?? 'Primera'}</AutocompleteItem>}
           </Autocomplete>
           <Autocomplete
             onSelectionChange={establishmentOnSelectionChange}
@@ -165,7 +220,7 @@ const NewFiscal = () => {
             placeholder="Busca un Establecimiento"
             className="max-w-sm"
           >
-            {(establishment) => <AutocompleteItem key={establishment.id_colegio}>{establishment.colegio ?? 'Primera'}</AutocompleteItem>}
+            {(establishment) => <AutocompleteItem key={establishment.id}>{establishment.value ?? 'Primera'}</AutocompleteItem>}
           </Autocomplete>
         </div>
 
@@ -173,7 +228,7 @@ const NewFiscal = () => {
           <span className="text-lg font-bold">Datos del Fiscal</span>
           <Input isRequired color="secondary" type="text" label="Nombre Completo" className="max-w-sm" />
           <Input isRequired color="secondary" type="email" label="Email" className="max-w-sm" />
-          <Input isRequired color="secondary" type='text' label="Telefono" className="max-w-sm" />
+          <Input isRequired color="secondary" type="text" label="Telefono" className="max-w-sm" />
           <div className="max-w-sm w-full">
             <Button type="submit" color="secondary" className="w-full" onClick={handleSubmit}>
               Crear Fiscal

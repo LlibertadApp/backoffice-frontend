@@ -1,120 +1,32 @@
 import { Key } from 'react';
-import mesasJSON from '../../assets/mesas.json';
-let count = 1;
-console.log('loaded mesas json', count);
-count++;
-export function getDistritos() {
-    const distritosSet = new Set();
-    const distritos = [];
-    for (const item of mesasJSON as any[]) {
-        const distritoId = item.distrito_id;
+import { CircuitoResponse, DistritoResponse } from '../../services/mesas';
 
-        // Check if distritoId is not already in the Set
-        if (!distritosSet.has(distritoId)) {
-            distritosSet.add(distritoId);
-            distritos.push({ distrito_id: distritoId, distrito_nombre: item.distrito_nombre });
-        }
-    }
+export const getElectoralSectionsFromDistritoObject = (distritoObject: DistritoResponse) => {
+  return Object.values(distritoObject.seccionprovincial).map((seccionProvincial) => ({
+    id: seccionProvincial.seccionprovincial_id,
+    value: seccionProvincial.seccionprovincial_nombre,
+  }));
+};
 
-    return distritos;
-}
+export const getSectionsByElectoralSectionId = (distritoObject: DistritoResponse, electoralSectionId: Key) => {
+  return Object.values(distritoObject.seccionprovincial[Number(electoralSectionId)].secciones).map((seccion) => ({
+    id: seccion.seccion_id,
+    value: seccion.seccion_nombre,
+  }));
+};
 
-export function getElectoralSectionsByDistritoId(targetDistritoId: Key) {
-    const electoralSectionsSet = new Set();
-    const electoralSections = [];
+export const getCircuitsBySectionId = (distritoObject: DistritoResponse, electoralSectionId: Key, sectionId: Key) => {
+  return Object.values(distritoObject.seccionprovincial[Number(electoralSectionId)].secciones[Number(sectionId)].circuitos).map((circuito) => ({
+    id: circuito.circuito_id,
+    value: circuito.circuito_nombre,
+  }));
+};
 
-    for (const item of mesasJSON as any[]) {
-        if (item.distrito_id == targetDistritoId) {
-            const electoralSectionId = item.seccionprovincial_id;
+export const getEstablishmentsByCircuitObject = (circuitObject: CircuitoResponse) => {
+  return Object.values(circuitObject.colegios).map((colegio) => ({ id: colegio.id_colegio, value: colegio.colegio }));
+};
 
-            // Check if the electoralSectionId is not already in the Set
-            if (!electoralSectionsSet.has(electoralSectionId)) {
-                electoralSectionsSet.add(electoralSectionId);
-
-                const electoralSectionNombre = item.seccionprovincial_nombre;
-
-                electoralSections.push({
-                    seccionprovincial_id: electoralSectionId,
-                    seccionprovincial_nombre: electoralSectionNombre,
-                });
-            }
-        }
-    }
-
-    return electoralSections;
-}
-
-export function getSectionsByElectoralSectionId(targetElectoralSectionID: Key) {
-    const sectionsSet = new Set();
-    const sections = [];
-
-    for (const item of mesasJSON as any[]) {
-        if (item.seccionprovincial_id == targetElectoralSectionID) {
-            const sectionId = item.seccion_id;
-
-            // Check if the sectionId is not already in the Set
-            if (!sectionsSet.has(sectionId)) {
-                sectionsSet.add(sectionId);
-
-                const sectionNombre = item.seccion_nombre;
-
-                sections.push({
-                    seccion_id: sectionId,
-                    seccion_nombre: sectionNombre,
-                });
-            }
-        }
-    }
-
-    return sections;
-}
-
-export function getCircuitBySectionId(targetSectionID: Key) {
-    const circuitSet = new Set();
-    const circuit = [];
-
-    for (const item of mesasJSON as any[]) {
-        if (item.seccion_id == targetSectionID) {
-            const circuitId = item.circuito_id;
-
-            // Check if the circuitId is not already in the Set
-            if (!circuitSet.has(circuitId)) {
-                circuitSet.add(circuitId);
-
-                const circuitNombre = item.circuito_nombre;
-
-                circuit.push({
-                    circuito_id: circuitId,
-                    circuito_nombre: circuitNombre,
-                });
-            }
-        }
-    }
-
-    return circuit;
-}
-
-export function getEstablishmentByCircuitId(targetCircuitID: Key) {
-    const establishmentSet = new Set();
-    const establishment = [];
-
-    for (const item of mesasJSON as any[]) {
-        if (item.circuito_id == targetCircuitID) {
-            const establishmentId = item.id_colegio;
-
-            // Check if the establishmentId is not already in the Set
-            if (!establishmentSet.has(establishmentId)) {
-                establishmentSet.add(establishmentId);
-
-                const establishmentName = item.colegio;
-
-                establishment.push({
-                    id_colegio: establishmentId,
-                    colegio: establishmentName,
-                });
-            }
-        }
-    }
-
-    return establishment;
-}
+export const getMesasByEstablishmentId = (circuitObject: CircuitoResponse, establishment: Key) => {
+  const colegio = circuitObject.colegios.find((colegio) => colegio.id_colegio == establishment);
+  return colegio?.mesas.map((mesa) => ({ id: mesa.uid_mesa, value: mesa.identificador_unico_mesa })) ?? [];
+};

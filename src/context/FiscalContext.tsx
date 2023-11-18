@@ -1,12 +1,12 @@
 import { Key, ReactNode, createContext, useContext, useState } from 'react';
-import { ElectoralSection, Section, Circuit, Establishment } from '../entities/ElectoralData';
+import { CircuitoResponse, DistritoResponse } from '../services/mesas';
 
 type FiscalContextType = {
   district: KeyOrNull;
   setDistrict: React.Dispatch<React.SetStateAction<KeyOrNull>>;
 
-  electoralSections: ElectoralSection[];
-  setElectoralSections: React.Dispatch<React.SetStateAction<ElectoralSection[]>>;
+  electoralSections: IdValueNumber[];
+  setElectoralSections: React.Dispatch<React.SetStateAction<IdValueNumber[]>>;
 
   electoralSection: KeyOrNull;
   setElectoralSection: React.Dispatch<React.SetStateAction<KeyOrNull>>;
@@ -14,23 +14,34 @@ type FiscalContextType = {
   section: KeyOrNull;
   setSection: React.Dispatch<React.SetStateAction<KeyOrNull>>;
 
-  sections: Section[];
-  setSections: React.Dispatch<React.SetStateAction<Section[]>>;
+  sections: IdValueNumber[];
+  setSections: React.Dispatch<React.SetStateAction<IdValueNumber[]>>;
 
   circuit: KeyOrNull;
   setCircuit: React.Dispatch<React.SetStateAction<KeyOrNull>>;
 
-  circuits: Circuit[];
-  setCircuits: React.Dispatch<React.SetStateAction<Circuit[]>>;
+  circuits: IdvalueString[];
+  setCircuits: React.Dispatch<React.SetStateAction<IdvalueString[]>>;
 
   establishment: KeyOrNull;
   setEstablishment: React.Dispatch<React.SetStateAction<KeyOrNull>>;
 
-  establishments: Establishment[];
-  setEstablishments: React.Dispatch<React.SetStateAction<Establishment[]>>;
+  establishments: IdvalueString[];
+  setEstablishments: React.Dispatch<React.SetStateAction<IdvalueString[]>>;
+
+  distritoCompleteObject: DistritoResponse | null;
+  setDistritoCompleteObject: React.Dispatch<React.SetStateAction<DistritoResponse | null>>;
+
+  circuitCompleteObject: CircuitoResponse | null;
+  setCircuitCompleteObject: React.Dispatch<React.SetStateAction<CircuitoResponse | null>>;
+
+  tables: IdvalueString[];
+  setTables: React.Dispatch<React.SetStateAction<IdvalueString[]>>;
 };
 
 type KeyOrNull = Key | null;
+type IdValueNumber = { id: number; value: string };
+type IdvalueString = { id: string; value: string };
 
 interface FiscalProviderProps {
   children: ReactNode;
@@ -40,18 +51,26 @@ const FiscalContext = createContext<FiscalContextType | undefined>(undefined);
 
 export const FiscalProvider: React.FC<FiscalProviderProps> = ({ children }: any) => {
   const [district, setDistrict] = useState<KeyOrNull>(null);
-  const [electoralSections, setElectoralSections] = useState<ElectoralSection[]>([]);
+
+  const [electoralSections, setElectoralSections] = useState<IdValueNumber[]>([]);
   const [electoralSection, setElectoralSection] = useState<KeyOrNull>(null);
   const [section, setSection] = useState<KeyOrNull>(null);
-  const [sections, setSections] = useState<Section[]>([]);
+  const [sections, setSections] = useState<IdValueNumber[]>([]);
   const [circuit, setCircuit] = useState<KeyOrNull>(null);
-  const [circuits, setCircuits] = useState<Circuit[]>([]);
+  const [circuits, setCircuits] = useState<IdvalueString[]>([]);
   const [establishment, setEstablishment] = useState<KeyOrNull>(null);
-  const [establishments, setEstablishments] = useState<Establishment[]>([]);
+  const [establishments, setEstablishments] = useState<IdvalueString[]>([]);
+
+  const [distritoCompleteObject, setDistritoCompleteObject] = useState<DistritoResponse | null>(null);
+  const [circuitCompleteObject, setCircuitCompleteObject] = useState<CircuitoResponse | null>(null);
+
+  const [tables, setTables] = useState<IdvalueString[]>([]);
 
   return (
     <FiscalContext.Provider
       value={{
+        distritoCompleteObject,
+        setDistritoCompleteObject,
         district,
         setDistrict,
         electoralSections,
@@ -70,6 +89,10 @@ export const FiscalProvider: React.FC<FiscalProviderProps> = ({ children }: any)
         setEstablishment,
         establishments,
         setEstablishments,
+        circuitCompleteObject,
+        setCircuitCompleteObject,
+        tables,
+        setTables,
       }}
     >
       {children}

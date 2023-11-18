@@ -30,7 +30,8 @@ jobs:
     - name: Build .env with Python
       run: |
         VARIABLES_JSON='{
-          "VITE_REACT_backend_endpoint": "${{ vars.VITE_REACT_backend_endpoint }}"
+          "VITE_REACT_backend_endpoint": "${{ vars.VITE_REACT_backend_endpoint }}",
+          "STATIC_DATA_ENDPOINT": "${{ vars.STATIC_DATA_ENDPOINT }}"
         }'
         python3 dotEnvGenerator.py "$VARIABLES_JSON"
         cat .env
