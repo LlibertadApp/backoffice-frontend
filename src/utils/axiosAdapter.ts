@@ -6,7 +6,7 @@ const axiosAdapter = axios.create({
 });
 
 export const staticDataAxios = axios.create({
-  baseURL: import.meta.env.STATIC_DATA_ENDPOINT,
+  baseURL: import.meta.env.VITE_REACT_static_data_endpoint,
   timeout: 5000,
 });
 

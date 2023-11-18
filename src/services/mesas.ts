@@ -71,13 +71,13 @@ export interface CircuitoResponse {
 }
 
 export const getDistritoById = async (distritoID: Key) => {
-  const { data } = await staticDataAxios.get<DistritoResponse>(`https://uploaded.dev.libertapp.net/mesas/${distritoID}.json`);
+  const { data } = await staticDataAxios.get<DistritoResponse>(`${distritoID}.json`);
   return data;
 };
 
 export const getCircuitoById = async (district: Key, electoralSection: Key, section: Key, circuit: Key) => {
   const { data } = await staticDataAxios.get<CircuitoResponse>(
-    `https://uploaded.dev.libertapp.net/mesas/${district}/${electoralSection}/${section}/${circuit}.json`
+    `${district}/${electoralSection}/${section}/${circuit}.json`
   );
   return data;
 };

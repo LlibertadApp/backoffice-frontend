@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - fix_env-var
 # env:
 #   ENVIRONMENT: "dev"
 #   Esto no funciona (ni ganas de renegar con el contexto)
@@ -31,7 +32,7 @@ jobs:
       run: |
         VARIABLES_JSON='{
           "VITE_REACT_backend_endpoint": "${{ vars.VITE_REACT_backend_endpoint }}",
-          "STATIC_DATA_ENDPOINT": "${{ vars.STATIC_DATA_ENDPOINT }}"
+          "VITE_REACT_static_data_endpoint": "${{ vars.VITE_REACT_static_data_endpoint }}"
         }'
         python3 dotEnvGenerator.py "$VARIABLES_JSON"
         cat .env
