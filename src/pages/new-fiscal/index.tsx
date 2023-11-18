@@ -15,6 +15,8 @@ import { distritos, getCircuitoById, getDistritoById } from '../../services/mesa
 import { Key, useCallback, useEffect, useState } from 'react';
 
 import { useFiscal } from '../../context/FiscalContext';
+import { postFiscal } from '../../services/fiscales';
+
 type distrito = keyof typeof distritos;
 const NewFiscal = () => {
   const {
@@ -49,11 +51,24 @@ const NewFiscal = () => {
   const [error, setError] = useState(false);
   const [loadingDistritoObject, setLoadingDistritoObject] = useState(false);
   const [loadingCircuitObject, setLoadingCircuitObject] = useState(false);
+  const [fullName, setFullName] = useState('');
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    navigate('/dashboard');
-  };
+  const handleSubmit = useCallback(
+    async (event: React.FormEvent) => {
+      event.preventDefault();
+      setError(false);
+      try {
+        await postFiscal({
+          fullName,
+          votingTables: tables.map((mesa) => mesa.id),
+        });
+        navigate('/dashboard');
+      } catch (error) {
+        setError(true);
+      }
+    },
+    [fullName, tables]
+  );
 
   const districtOnSelectionChange = (distrito_id: Key) => {
     const selectedDistrictValue = distritos[distrito_id as distrito];
@@ -73,6 +88,7 @@ const NewFiscal = () => {
   const getDistrictData = useCallback(async () => {
     if (district) {
       setLoadingDistritoObject(true);
+      setError(false);
       try {
         const distritoCompleteObject = await getDistritoById(district.id);
         setDistritoCompleteObject(distritoCompleteObject);
@@ -174,6 +190,7 @@ const NewFiscal = () => {
   const getCircuitData = useCallback(async (district: Key, electoralSection: Key, section: Key, circuit: Key) => {
     setLoadingCircuitObject(true);
     try {
+      setError(false);
       const circuitData = await getCircuitoById(district, electoralSection, section, circuit);
       setCircuitCompleteObject(circuitData);
       setEstablishments(getEstablishmentsByCircuitObject(circuitData));
@@ -303,9 +320,16 @@ const NewFiscal = () => {
 
         <div className="w-120 flex flex-col gap-4 pt-8 items-center">
           <span className="text-lg font-bold">Datos del Fiscal</span>
-          <Input isRequired color="default" type="text" label="Nombre Completo" className="max-w-sm" />
+          <Input
+            color="default"
+            type="text"
+            label="Nombre Completo"
+            className="max-w-sm"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
           <div className="max-w-sm w-full pt-24">
-            <Button type="submit" color="secondary" className="w-full" onClick={handleSubmit}>
+            <Button type="button" color="secondary" className="w-full" onClick={handleSubmit}>
               Crear Fiscal
             </Button>
           </div>

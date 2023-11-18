@@ -1,172 +1,335 @@
-import { Input, Button, Autocomplete, AutocompleteItem } from '@nextui-org/react';
-import { Link } from 'react-router-dom';
+import { Input, Button, Autocomplete, AutocompleteItem, Chip, CircularProgress } from '@nextui-org/react';
+import { useNavigate } from 'react-router-dom';
+
 import {
-  getDistritos,
-  getElectoralSectionsByDistritoId,
+  getCircuitsBySectionId,
+  getElectoralSectionsFromDistritoObject,
+  getEstablishmentsByCircuitObject,
+  getMesasByEstablishmentId,
   getSectionsByElectoralSectionId,
-  getCircuitBySectionId,
-  getEstablishmentByCircuitId,
 } from './helpers';
+
 import { Navbar } from '../../components/Navbar/Navbar';
-import { ElectoralSection, Section, Circuit, Establishment } from '../../entities/ElectoralData';
-import { Key, useEffect, useMemo, useState } from 'react';
-import { getDistritoById } from '../../services/mesas';
 
-type KeyOrNull = Key | null;
+import { distritos, getCircuitoById, getDistritoById } from '../../services/mesas';
+import { Key, useCallback, useEffect, useState } from 'react';
 
+import { useEditFiscal } from '../../context/FiscalEditContext';
+import { editFiscal } from '../../services/fiscales';
+type distrito = keyof typeof distritos;
 const EditarFiscal = () => {
-  const [district, setDistrict] = useState<KeyOrNull>(null);
-  const [electoralSections, setElectoralSections] = useState<ElectoralSection[]>([]);
-  const [electoralSection, setElectoralSection] = useState<KeyOrNull>(null);
-  const [section, setSection] = useState<KeyOrNull>(null);
-  const [sections, setSections] = useState<Section[]>([]);
-  const [circuit, setCircuit] = useState<KeyOrNull>(null);
-  const [circuits, setCircuits] = useState<Circuit[]>([]);
-  const [establishment, setEstablishment] = useState<KeyOrNull>(null);
-  const [establishments, setEstablishments] = useState<Establishment[]>([]);
+  const {
+    district,
+    setDistrict,
+    electoralSections,
+    setElectoralSections,
+    electoralSection,
+    setElectoralSection,
+    section,
+    setSection,
+    sections,
+    setSections,
+    circuit,
+    setCircuit,
+    circuits,
+    setCircuits,
+    establishment,
+    setEstablishment,
+    establishments,
+    setEstablishments,
+    setDistritoCompleteObject,
+    distritoCompleteObject,
+    circuitCompleteObject,
+    setCircuitCompleteObject,
+    tables,
+    setTables,
+  } = useEditFiscal();
 
-  useEffect(() => {
-    getDistritoById(1);
-  }, []);
+  const navigate = useNavigate();
 
-  const districts = useMemo(() => {
-    return getDistritos();
+  const [error, setError] = useState(false);
+  const [loadingDistritoObject, setLoadingDistritoObject] = useState(false);
+  const [loadingCircuitObject, setLoadingCircuitObject] = useState(false);
+
+  const [fullName, setFullName] = useState('');
+
+  const handleSubmit = useCallback(async (event: React.FormEvent) => {
+    event.preventDefault();
+    try {
+      setError(false);
+      await editFiscal({
+        fullName,
+        votingTables: tables.map((mesa) => mesa.id),
+      });
+      navigate('/dashboard');
+    } catch (error) {
+      setError(true);
+    }
   }, []);
 
   const districtOnSelectionChange = (distrito_id: Key) => {
-    setDistrict(distrito_id);
+    const selectedDistrictValue = distritos[distrito_id as distrito];
+    setDistrict((prev) => {
+      if (prev?.id !== distrito_id) {
+        setDistritoCompleteObject(null);
+        setElectoralSection(null);
+        setSection(null);
+        setCircuit(null);
+        setCircuitCompleteObject(null);
+        setEstablishment(null);
+      }
+      return { id: distrito_id, value: selectedDistrictValue };
+    });
   };
 
-  useEffect(() => {
+  const getDistrictData = useCallback(async () => {
     if (district) {
-      setElectoralSections(getElectoralSectionsByDistritoId(district));
+      setLoadingDistritoObject(true);
+      try {
+        setError(false);
+        const distritoCompleteObject = await getDistritoById(district.id);
+        setDistritoCompleteObject(distritoCompleteObject);
+        setElectoralSections(getElectoralSectionsFromDistritoObject(distritoCompleteObject));
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoadingDistritoObject(false);
+      }
     } else {
       setElectoralSections([]);
     }
   }, [district]);
 
-  const electoralSectionOnSelectionChange = (seccionprovincial_id: Key) => {
-    setElectoralSection(seccionprovincial_id);
-  };
+  useEffect(() => {
+    getDistrictData();
+  }, [getDistrictData]);
+
+  const electoralSectionOnSelectionChange = useCallback(
+    (electoralSectionID: Key) => {
+      setElectoralSection((prev) => {
+        const selectedElectoralSection = electoralSections.find((es) => es.id == electoralSectionID);
+
+        if (selectedElectoralSection) {
+          if (prev?.id !== electoralSectionID) {
+            setSection(null);
+            setCircuit(null);
+            setCircuitCompleteObject(null);
+            setEstablishment(null);
+          }
+          return { id: electoralSectionID, value: selectedElectoralSection?.value };
+        } else {
+          setSection(null);
+          setCircuit(null);
+          setCircuitCompleteObject(null);
+          setEstablishment(null);
+          return null;
+        }
+      });
+    },
+    [electoralSections]
+  );
 
   useEffect(() => {
-    if (electoralSection) {
-      setSections(getSectionsByElectoralSectionId(electoralSection));
+    if (distritoCompleteObject && electoralSection) {
+      setSections(getSectionsByElectoralSectionId(distritoCompleteObject, electoralSection.id));
     } else {
       setSections([]);
     }
-  }, [electoralSection]);
+  }, [electoralSection, distritoCompleteObject]);
 
-  const sectionOnSelectionChange = (seccion_id: Key) => {
-    setSection(seccion_id);
-  };
+  const sectionOnSelectionChange = useCallback(
+    (sectionID: Key) => {
+      setSection((prev) => {
+        const selectedSection = sections.find((sc) => sc.id == sectionID);
+        if (selectedSection) {
+          if (prev?.id !== sectionID) {
+            setCircuit(null);
+            setCircuitCompleteObject(null);
+            setEstablishment(null);
+          }
+          return { id: sectionID, value: selectedSection?.value };
+        } else {
+          setCircuit(null);
+          setCircuitCompleteObject(null);
+          setEstablishment(null);
+          return null;
+        }
+      });
+    },
+    [sections]
+  );
 
   useEffect(() => {
-    if (section) {
-      setCircuits(getCircuitBySectionId(section));
+    if (section && distritoCompleteObject && electoralSection) {
+      setCircuits(getCircuitsBySectionId(distritoCompleteObject, electoralSection.id, section.id));
     } else {
       setCircuits([]);
     }
-  }, [section]);
+  }, [section, electoralSection, distritoCompleteObject]);
 
-  const circuitOnSelectionChange = (circuito_id: Key) => {
-    setCircuit(circuito_id);
+  const circuitOnSelectionChange = (circuitID: Key) => {
+    setCircuit((prev) => {
+      const selectedCircuit = circuits.find((ci) => ci.id == circuitID);
+      if (selectedCircuit) {
+        if (prev?.id !== circuitID) {
+          setCircuitCompleteObject(null);
+          setEstablishment(null);
+        }
+        return { id: circuitID, value: selectedCircuit.value };
+      } else {
+        setCircuitCompleteObject(null);
+        setEstablishment(null);
+        return null;
+      }
+    });
   };
 
+  const getCircuitData = useCallback(async (district: Key, electoralSection: Key, section: Key, circuit: Key) => {
+    setLoadingCircuitObject(true);
+    try {
+      setError(false);
+      const circuitData = await getCircuitoById(district, electoralSection, section, circuit);
+      setCircuitCompleteObject(circuitData);
+      setEstablishments(getEstablishmentsByCircuitObject(circuitData));
+    } catch (error) {
+      setError(true);
+    } finally {
+      setLoadingCircuitObject(false);
+    }
+  }, []);
+
   useEffect(() => {
-    if (circuit) {
-      setEstablishments(getEstablishmentByCircuitId(circuit));
+    if (circuit && district && electoralSection && section && circuit) {
+      getCircuitData(district.id, electoralSection.id, section.id, circuit.id);
     } else {
       setEstablishments([]);
     }
-  }, [circuit]);
+  }, [circuit, section, electoralSection, district]);
 
-  const establishmentOnSelectionChange = (id_colegio: Key) => {
-    setEstablishment(id_colegio);
-  };
+  const establishmentOnSelectionChange = useCallback(
+    (establishmentID: Key) => {
+      const selectedEstablishment = establishments.find((es) => es.id == establishmentID);
+      if (selectedEstablishment) {
+        setEstablishment({ id: establishmentID, value: selectedEstablishment.value });
+      } else {
+        setEstablishment(null);
+      }
+    },
+    [establishments]
+  );
 
-  console.log('district', district);
-  console.log('electoralSection', electoralSection);
-  console.log('section', section);
-  console.log('circuit', circuit);
-  console.log('establishment', establishment);
+  useEffect(() => {
+    if (establishment && circuitCompleteObject) {
+      setTables(getMesasByEstablishmentId(circuitCompleteObject, establishment.id));
+    } else {
+      setTables([]);
+    }
+  }, [establishment]);
 
-  const EditFiscal = () => {
-    console.log('fiscal editadoo');
-  };
+  if (error) {
+    return <div>Hubo un error, vuelve atras por favor</div>;
+  }
 
   return (
-    <div className="justify-center">
+    <div>
       <Navbar />
-
-      <div className="text-xl items-center px-20 pt-2">
-        <p className="text-bold text-3xl">Editando Fiscal</p>
-      </div>
-
-      <div className="px-8 container pt-4">
-        <div className="w-150 flex flex-col gap-4  ">
+      <div className="px-20 container mx-auto">
+        <div className="w-150 flex flex-col gap-4 items-center">
           <span className="text-lg font-bold pt-4">Datos Electorales</span>
+
           <Autocomplete
+            value={district?.value ?? ''}
+            selectedKey={String(district?.id)}
             onSelectionChange={districtOnSelectionChange}
-            defaultItems={districts}
+            defaultItems={Object.entries(distritos).map(([key, value]) => ({ id: key, value }))}
             label="Distrito"
             placeholder="Busca un Distrito"
             className="max-w-sm"
           >
-            {(district) => <AutocompleteItem key={district.distrito_id}>{district.distrito_nombre}</AutocompleteItem>}
+            {(district) => <AutocompleteItem key={district.id}>{district.value}</AutocompleteItem>}
           </Autocomplete>
-          <Autocomplete
-            onSelectionChange={electoralSectionOnSelectionChange}
-            defaultItems={electoralSections}
-            label="Seccion Electoral"
-            placeholder="Busca una SeccionElectoral"
-            className="max-w-sm"
-          >
-            {(electoralSection) => (
-              <AutocompleteItem key={electoralSection.seccionprovincial_id}>
-                {electoralSection.seccionprovincial_nombre ?? 'Primera'}
-              </AutocompleteItem>
-            )}
-          </Autocomplete>
-          <Autocomplete
-            onSelectionChange={sectionOnSelectionChange}
-            defaultItems={sections}
-            label="Seccion "
-            placeholder="Busca una Seccion"
-            className="max-w-sm"
-          >
-            {(section) => <AutocompleteItem key={section.seccion_id}>{section.seccion_nombre ?? 'Primera'}</AutocompleteItem>}
-          </Autocomplete>
-          <Autocomplete
-            onSelectionChange={circuitOnSelectionChange}
-            defaultItems={circuits}
-            label="Circuito "
-            placeholder="Busca un Circuito"
-            className="max-w-sm"
-          >
-            {(circuit) => <AutocompleteItem key={circuit.circuito_id}>{circuit.circuito_nombre ?? 'Primera'}</AutocompleteItem>}
-          </Autocomplete>
-          <Autocomplete
-            onSelectionChange={establishmentOnSelectionChange}
-            defaultItems={establishments}
-            label="Establecimiento"
-            placeholder="Busca un Establecimiento"
-            className="max-w-sm"
-          >
-            {(establishment) => <AutocompleteItem key={establishment.id_colegio}>{establishment.colegio ?? 'Primera'}</AutocompleteItem>}
-          </Autocomplete>
+          {!loadingDistritoObject ? (
+            <>
+              <Autocomplete
+                defaultInputValue={electoralSection?.value}
+                defaultSelectedKey={String(electoralSection?.id)}
+                onSelectionChange={electoralSectionOnSelectionChange}
+                defaultItems={electoralSections}
+                label="Seccion Electoral"
+                placeholder="Busca una SeccionElectoral"
+                className="max-w-sm"
+              >
+                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value ?? 'Primera'}</AutocompleteItem>}
+              </Autocomplete>
+              <Autocomplete
+                defaultInputValue={section?.value}
+                defaultSelectedKey={String(section?.id)}
+                onSelectionChange={sectionOnSelectionChange}
+                defaultItems={sections}
+                label="Seccion "
+                placeholder="Busca una Seccion"
+                className="max-w-sm"
+              >
+                {(section) => <AutocompleteItem key={section.id}>{section.value ?? 'Primera'}</AutocompleteItem>}
+              </Autocomplete>
+              <Autocomplete
+                defaultInputValue={circuit?.value}
+                defaultSelectedKey={String(circuit?.id)}
+                onSelectionChange={circuitOnSelectionChange}
+                defaultItems={circuits}
+                label="Circuito "
+                placeholder="Busca un Circuito"
+                className="max-w-sm"
+              >
+                {(circuit) => <AutocompleteItem key={circuit.id}>{circuit.value ?? 'Primera'}</AutocompleteItem>}
+              </Autocomplete>
+              {!loadingCircuitObject ? (
+                <Autocomplete
+                  defaultInputValue={establishment?.value}
+                  defaultSelectedKey={String(establishment?.id)}
+                  onSelectionChange={establishmentOnSelectionChange}
+                  defaultItems={establishments}
+                  label="Establecimiento"
+                  placeholder="Busca un Establecimiento"
+                  className="max-w-sm"
+                >
+                  {(establishment) => <AutocompleteItem key={establishment.id}>{establishment.value ?? 'Primera'}</AutocompleteItem>}
+                </Autocomplete>
+              ) : (
+                <CircularProgress aria-label="Loading..." />
+              )}
+            </>
+          ) : (
+            <CircularProgress aria-label="Loading..." />
+          )}
+
+          {tables.length ? (
+            <div className="w-150 flex flex-col gap-4 items-center">
+              <span className="text-lg font-bold pt-4">Mesas Asignadas</span>
+              <div className="max-w-sm flex flex-row gap-4 items-center flex-wrap">
+                {tables.map((table) => (
+                  <Chip key={table.id}>{table.value}</Chip>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
 
-        <div className="w-120 flex flex-col gap-4 pt-4">
+        <div className="w-120 flex flex-col gap-4 pt-8 items-center">
           <span className="text-lg font-bold">Datos del Fiscal</span>
-          <Input type="text" label="Nombre Completo" className="max-w-sm " />
-          <Input type="email" label="Email" className="max-w-sm" />
-          <Input type="text" label="Telefono" className="max-w-sm" />
-          <Link to="/dashboard" className="max-w-sm">
-            <Button type="button" color="secondary" className="w-full" onClick={() => EditFiscal}>
+          <Input
+            color="default"
+            type="text"
+            label="Nombre Completo"
+            className="max-w-sm"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
+          <div className="max-w-sm w-full pt-24">
+            <Button type="submit" color="secondary" className="w-full" onClick={handleSubmit}>
               Editar Fiscal
             </Button>
-          </Link>
+          </div>
         </div>
       </div>
     </div>

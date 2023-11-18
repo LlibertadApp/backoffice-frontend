@@ -6,6 +6,7 @@ import AppRouter from './routes/router.tsx';
 import { BrowserRouter } from 'react-router-dom';
 
 import { FiscalProvider } from './context/FiscalContext.tsx';
+import { FiscalEditProvider } from './context/FiscalEditContext.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
@@ -14,9 +15,11 @@ createRoot(document.getElementById('root')!).render(
       <NextUIProvider>
         <AuthProvider>
           <FiscalProvider>
-            <main className="dark text-foreground bg-neutral-950 w-screen h-screen">
-              <AppRouter />
-            </main>
+            <FiscalEditProvider>
+              <main className="dark text-foreground bg-neutral-950 w-screen h-screen">
+                <AppRouter />
+              </main>
+            </FiscalEditProvider>
           </FiscalProvider>
         </AuthProvider>
       </NextUIProvider>
