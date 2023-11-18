@@ -1,5 +1,7 @@
-import { Key, ReactNode, createContext, useContext, useState } from 'react';
+import { Key, ReactNode, createContext, useContext, useState, useEffect } from 'react';
 import { CircuitoResponse, DistritoResponse } from '../services/mesas';
+
+import { FiscalWithLink } from '../pages/dashboard';
 
 type FiscalEditContextType = {
   district: KeyValueOrNull;
@@ -37,6 +39,9 @@ type FiscalEditContextType = {
 
   tables: IdvalueString[];
   setTables: React.Dispatch<React.SetStateAction<IdvalueString[]>>;
+
+  fiscalToEdit: FiscalWithLink | null;
+  setFiscalToEdit: React.Dispatch<React.SetStateAction<FiscalWithLink | null>>;
 };
 type KeyValueOrNull = { id: Key; value: string } | null;
 type IdValueNumber = { id: number; value: string };
@@ -65,6 +70,18 @@ export const FiscalEditProvider: React.FC<FiscalProviderProps> = ({ children }: 
 
   const [tables, setTables] = useState<IdvalueString[]>([]);
 
+  const [fiscalToEdit, setFiscalToEdit] = useState<FiscalWithLink | null>(null);
+
+  useEffect(() => {
+    if (fiscalToEdit) {
+      setDistrict({ id: fiscalToEdit.votingTables[0].districtId, value: '' });
+      setElectoralSection({ id: fiscalToEdit.votingTables[0].subsectionId, value: '' });
+      setSection({ id: fiscalToEdit.votingTables[0].sectionId, value: '' });
+      setCircuit({ id: fiscalToEdit.votingTables[0].circuitId, value: '' });
+      setEstablishment({ id: fiscalToEdit.votingTables[0].establishmentId, value: '' });
+    }
+  }, [fiscalToEdit]);
+
   return (
     <FiscalEditContext.Provider
       value={{
@@ -92,6 +109,8 @@ export const FiscalEditProvider: React.FC<FiscalProviderProps> = ({ children }: 
         setCircuitCompleteObject,
         tables,
         setTables,
+        fiscalToEdit,
+        setFiscalToEdit,
       }}
     >
       {children}

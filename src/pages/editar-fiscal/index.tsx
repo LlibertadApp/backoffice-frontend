@@ -46,12 +46,13 @@ const EditarFiscal = () => {
   } = useEditFiscal();
 
   const navigate = useNavigate();
+  const { fiscalToEdit } = useEditFiscal();
 
   const [error, setError] = useState(false);
   const [loadingDistritoObject, setLoadingDistritoObject] = useState(false);
   const [loadingCircuitObject, setLoadingCircuitObject] = useState(false);
 
-  const [fullName, setFullName] = useState('');
+  const [fullName, setFullName] = useState(fiscalToEdit?.fullName ?? '');
 
   const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
@@ -110,6 +111,9 @@ const EditarFiscal = () => {
         const selectedElectoralSection = electoralSections.find((es) => es.id == electoralSectionID);
 
         if (selectedElectoralSection) {
+          if (selectedElectoralSection.value === null) {
+            selectedElectoralSection.value = 'Primera';
+          }
           if (prev?.id !== electoralSectionID) {
             setSection(null);
             setCircuit(null);
@@ -130,6 +134,12 @@ const EditarFiscal = () => {
   );
 
   useEffect(() => {
+    if (electoralSection?.id && !electoralSection?.value && electoralSections?.length) {
+      electoralSectionOnSelectionChange(electoralSection.id);
+    }
+  }, [electoralSections, electoralSectionOnSelectionChange]);
+
+  useEffect(() => {
     if (distritoCompleteObject && electoralSection) {
       setSections(getSectionsByElectoralSectionId(distritoCompleteObject, electoralSection.id));
     } else {
@@ -142,6 +152,9 @@ const EditarFiscal = () => {
       setSection((prev) => {
         const selectedSection = sections.find((sc) => sc.id == sectionID);
         if (selectedSection) {
+          if (selectedSection.value === null) {
+            selectedSection.value = 'Primera';
+          }
           if (prev?.id !== sectionID) {
             setCircuit(null);
             setCircuitCompleteObject(null);
@@ -160,6 +173,12 @@ const EditarFiscal = () => {
   );
 
   useEffect(() => {
+    if (section?.id && !section?.value && sections?.length) {
+      sectionOnSelectionChange(section.id);
+    }
+  }, [sections, sectionOnSelectionChange]);
+
+  useEffect(() => {
     if (section && distritoCompleteObject && electoralSection) {
       setCircuits(getCircuitsBySectionId(distritoCompleteObject, electoralSection.id, section.id));
     } else {
@@ -171,6 +190,9 @@ const EditarFiscal = () => {
     setCircuit((prev) => {
       const selectedCircuit = circuits.find((ci) => ci.id == circuitID);
       if (selectedCircuit) {
+        if (selectedCircuit.value === null) {
+          selectedCircuit.value = 'Primera';
+        }
         if (prev?.id !== circuitID) {
           setCircuitCompleteObject(null);
           setEstablishment(null);
@@ -199,6 +221,12 @@ const EditarFiscal = () => {
   }, []);
 
   useEffect(() => {
+    if (circuit?.id && !circuit?.value && circuits?.length) {
+      circuitOnSelectionChange(circuit.id);
+    }
+  }, [circuits, circuitOnSelectionChange]);
+
+  useEffect(() => {
     if (circuit && district && electoralSection && section && circuit) {
       getCircuitData(district.id, electoralSection.id, section.id, circuit.id);
     } else {
@@ -210,6 +238,9 @@ const EditarFiscal = () => {
     (establishmentID: Key) => {
       const selectedEstablishment = establishments.find((es) => es.id == establishmentID);
       if (selectedEstablishment) {
+        if (selectedEstablishment.value === null) {
+          selectedEstablishment.value = 'Primera';
+        }
         setEstablishment({ id: establishmentID, value: selectedEstablishment.value });
       } else {
         setEstablishment(null);
@@ -217,6 +248,12 @@ const EditarFiscal = () => {
     },
     [establishments]
   );
+
+  useEffect(() => {
+    if (establishment?.id && !establishment?.value && establishments?.length) {
+      establishmentOnSelectionChange(establishment.id);
+    }
+  }, [establishments, establishmentOnSelectionChange]);
 
   useEffect(() => {
     if (establishment && circuitCompleteObject) {
@@ -227,7 +264,15 @@ const EditarFiscal = () => {
   }, [establishment]);
 
   if (error) {
-    return <div>Hubo un error, vuelve atras por favor</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h1 className="text-4xl tracking-widest leading-10 my-2">Ha ocurrido un error al editar el fiscal</h1>
+        <p className="text-xl">Por favor, intentelo nuevamente.</p>
+        <Button type="button" color="default" size="lg" className="my-4 max-w-xs" onClick={() => navigate('/dashboard')}>
+          Volver a inicio
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -251,49 +296,49 @@ const EditarFiscal = () => {
           {!loadingDistritoObject ? (
             <>
               <Autocomplete
-                defaultInputValue={electoralSection?.value}
-                defaultSelectedKey={String(electoralSection?.id)}
+                inputValue={electoralSection?.value}
+                selectedKey={String(electoralSection?.id)}
                 onSelectionChange={electoralSectionOnSelectionChange}
                 defaultItems={electoralSections}
                 label="Seccion Electoral"
                 placeholder="Busca una SeccionElectoral"
                 className="max-w-sm"
               >
-                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value ?? 'Primera'}</AutocompleteItem>}
+                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
-                defaultInputValue={section?.value}
-                defaultSelectedKey={String(section?.id)}
+                inputValue={section?.value}
+                selectedKey={String(section?.id)}
                 onSelectionChange={sectionOnSelectionChange}
                 defaultItems={sections}
                 label="Seccion "
                 placeholder="Busca una Seccion"
                 className="max-w-sm"
               >
-                {(section) => <AutocompleteItem key={section.id}>{section.value ?? 'Primera'}</AutocompleteItem>}
+                {(section) => <AutocompleteItem key={section.id}>{section.value}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
-                defaultInputValue={circuit?.value}
-                defaultSelectedKey={String(circuit?.id)}
+                inputValue={circuit?.value}
+                selectedKey={String(circuit?.id)}
                 onSelectionChange={circuitOnSelectionChange}
                 defaultItems={circuits}
                 label="Circuito "
                 placeholder="Busca un Circuito"
                 className="max-w-sm"
               >
-                {(circuit) => <AutocompleteItem key={circuit.id}>{circuit.value ?? 'Primera'}</AutocompleteItem>}
+                {(circuit) => <AutocompleteItem key={circuit.id}>{circuit.value}</AutocompleteItem>}
               </Autocomplete>
               {!loadingCircuitObject ? (
                 <Autocomplete
-                  defaultInputValue={establishment?.value}
-                  defaultSelectedKey={String(establishment?.id)}
+                  inputValue={establishment?.value}
+                  selectedKey={String(establishment?.id)}
                   onSelectionChange={establishmentOnSelectionChange}
                   defaultItems={establishments}
                   label="Establecimiento"
                   placeholder="Busca un Establecimiento"
                   className="max-w-sm"
                 >
-                  {(establishment) => <AutocompleteItem key={establishment.id}>{establishment.value ?? 'Primera'}</AutocompleteItem>}
+                  {(establishment) => <AutocompleteItem key={establishment.id}>{establishment.value}</AutocompleteItem>}
                 </Autocomplete>
               ) : (
                 <CircularProgress aria-label="Loading..." />
