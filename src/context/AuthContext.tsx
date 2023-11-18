@@ -24,19 +24,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: any) => 
   const login = async (username: string, password: string) => {
     try {
       const {
-        data: {
-          data: { token },
-        },
+        data: { token },
       } = await axios.post('v1/auth/login', {
         username,
         password,
       });
-      console.log('Formulario de login enviado');
-
-      console.log(token);
 
       if (token) {
-        console.log('Login exitoso');
         setToken(token);
         setUser(username);
       }
@@ -53,10 +47,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: any) => 
       const currentTime = Date.now() / 1000;
 
       if (decodedToken.exp < currentTime) {
-        console.log('Token is expired');
+        console.error('Token is expired');
         sessionStorage.removeItem('authToken');
       } else {
-        console.log('Token is not expired');
         sessionStorage.setItem('authToken', token);
       }
     }
