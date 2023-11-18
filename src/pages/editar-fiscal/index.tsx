@@ -51,7 +51,6 @@ const EditarFiscal = () => {
   const [error, setError] = useState(false);
   const [loadingDistritoObject, setLoadingDistritoObject] = useState(false);
   const [loadingCircuitObject, setLoadingCircuitObject] = useState(false);
-
   const [fullName, setFullName] = useState(fiscalToEdit?.fullName ?? '');
 
   const handleSubmit = useCallback(async (event: React.FormEvent) => {

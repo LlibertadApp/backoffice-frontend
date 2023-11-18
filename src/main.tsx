@@ -16,9 +16,7 @@ createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <FiscalProvider>
             <FiscalEditProvider>
-              <main className="dark text-foreground bg-neutral-950 w-screen h-screen">
-                <AppRouter />
-              </main>
+              <AppRouter />
             </FiscalEditProvider>
           </FiscalProvider>
         </AuthProvider>
