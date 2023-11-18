@@ -1,5 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import { NextUIProvider } from '@nextui-org/react';
 import AppRouter from './routes/router.tsx';
@@ -8,8 +8,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { FiscalProvider } from './context/FiscalContext.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
     <BrowserRouter>
       <NextUIProvider>
         <AuthProvider>
@@ -21,5 +21,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </AuthProvider>
       </NextUIProvider>
     </BrowserRouter>
-  </React.StrictMode>
+  </StrictMode>
 );
