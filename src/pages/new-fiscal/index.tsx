@@ -1,4 +1,4 @@
-import { Input, Button, Autocomplete, AutocompleteItem } from '@nextui-org/react';
+import { Input, Button, Autocomplete, AutocompleteItem, Chip } from '@nextui-org/react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -163,20 +163,12 @@ const NewFiscal = () => {
     }
   }, [establishment]);
 
-  console.log('district', district);
-  console.log('electoralSection', electoralSection);
-  console.log('sections', sections);
-  console.log('circuit', circuit);
-  console.log('establishment', establishment);
-  console.log('error', error);
-  console.log('tables', tables);
-
   return (
     <div>
       <Navbar />
-      <div className="px-20 container mx-auto">
+      <div className="px-20 container mx-auto flex flex-row gap-5 justify-center align-items-start pt-4">
         <div className="w-150 flex flex-col gap-4 items-center">
-          <span className="text-lg font-bold pt-4">Datos Electorales</span>
+          <span className="text-lg font-bold">Datos Electorales</span>
           <Autocomplete
             onSelectionChange={districtOnSelectionChange}
             defaultItems={Object.entries(distritos).map(([key, value]) => ({ id: key, value }))}
@@ -222,9 +214,20 @@ const NewFiscal = () => {
           >
             {(establishment) => <AutocompleteItem key={establishment.id}>{establishment.value ?? 'Primera'}</AutocompleteItem>}
           </Autocomplete>
+
+          {tables.length ? (
+            <div className="w-150 flex flex-col gap-4 items-center">
+              <span className="text-lg font-bold pt-4">Mesas Asignadas</span>
+              <div className="max-w-sm flex flex-row gap-4 items-center flex-wrap">
+                {tables.map((table) => (
+                  <Chip key={table.id}>{table.value}</Chip>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
 
-        <div className="w-120 flex flex-col gap-4 pt-8 items-center">
+        <div className="w-120 flex flex-col gap-4 items-center">
           <span className="text-lg font-bold">Datos del Fiscal</span>
           <Input isRequired color="secondary" type="text" label="Nombre Completo" className="max-w-sm" />
           <Input isRequired color="secondary" type="email" label="Email" className="max-w-sm" />
