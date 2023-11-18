@@ -226,10 +226,8 @@ const NewFiscal = () => {
 
         <div className="w-120 flex flex-col gap-4 pt-8 items-center">
           <span className="text-lg font-bold">Datos del Fiscal</span>
-          <Input isRequired color="secondary" type="text" label="Nombre Completo" className="max-w-sm" />
-          <Input isRequired color="secondary" type="email" label="Email" className="max-w-sm" />
-          <Input isRequired color="secondary" type="text" label="Telefono" className="max-w-sm" />
-          <div className="max-w-sm w-full">
+          <Input isRequired color="white" type="text" label="Nombre Completo" className="max-w-sm" />
+          <div className="max-w-sm w-full pt-24">
             <Button type="submit" color="secondary" className="w-full" onClick={handleSubmit}>
               Crear Fiscal
             </Button>

@@ -24,9 +24,7 @@ import { PlusIcon } from '../../assets/PlusIcon';
 import { SearchIcon } from '../../assets/SearchIcon';
 
 const columns = [
-    { name: 'Nombre Completo', uid: 'fullName' },
-    { name: 'Email', uid: 'email' },
-    { name: 'Telefono', uid: 'phone' },
+    { name: 'Nombre', uid: 'fullName' },
     { name: 'Estado', uid: 'status' },
     { name: 'Acciones', uid: 'actions' },
 ];
@@ -65,9 +63,9 @@ const Dashboard = () => {
                 );
             case 'actions':
                 return (
-                    <div className="relative flex items-center gap-4">
+                    <div className="relative flex items-center gap-6">
                         <Snippet symbol="" codeString={fiscal.magicLink}>
-                            Copiar Link
+                        Link
                         </Snippet>
 
                         <Link to={'/edit-fiscal'} className="text-black">
@@ -115,7 +113,7 @@ const Dashboard = () => {
     }, []);
 
     const [page, setPage] = useState(1);
-    const rowsPerPage = 4;
+    const rowsPerPage = 9;
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
     const items = useMemo(() => {
@@ -165,11 +163,6 @@ const Dashboard = () => {
                                 />
                             </svg>
                         </div>
-                        <Button className="md:hidden focus:outline-none focus:shadow-outline">
-                            <svg fill="currentColor" viewBox="0 0 20 20" className="w-6 h-6">
-                                <path d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z"></path>
-                            </svg>
-                        </Button>
                     </div>
                 </div>
             </div>
@@ -178,19 +171,6 @@ const Dashboard = () => {
                     aria-label="Example table with custom cells"
                     topContent={topContent}
                     topContentPlacement="outside"
-                    bottomContent={
-                        <div className="flex w-full justify-center">
-                            <Pagination
-                                isCompact
-                                showControls
-                                showShadow
-                                color="secondary"
-                                page={page}
-                                total={pages}
-                                onChange={(page) => setPage(page)}
-                            />
-                        </div>
-                    }
                 >
                     <TableHeader columns={columns}>
                         {(column) => (
@@ -206,6 +186,17 @@ const Dashboard = () => {
 
                 <DeleteFiscalModal onOpenChange={onOpenChange} isOpen={isOpen} fiscalID={deleteFiscalID} />
             </div>
+            <div className="flex w-full justify-center pt-4">
+                            <Pagination
+                                isCompact
+                                showControls
+                                showShadow
+                                color="secondary"
+                                page={page}
+                                total={pages}
+                                onChange={(page) => setPage(page)}
+                            />
+                        </div>
         </div>
     );
 };
