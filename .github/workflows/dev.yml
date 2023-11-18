@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev
-      - fix_env-var
 # env:
 #   ENVIRONMENT: "dev"
 #   Esto no funciona (ni ganas de renegar con el contexto)
