@@ -1,4 +1,3 @@
-import { dummyFiscales } from '../pages/dashboard/data';
 import axios from '../utils/axiosAdapter';
 
 interface postFiscalInterface {
@@ -39,17 +38,11 @@ export interface Fiscal {
 }
 
 export const getFiscales = async () => {
-  /*
   const { data } = await axios.get<Fiscal[]>('/v1/fiscals');
-  return data;*/
-  await new Promise((r) => setTimeout(r, 2000));
-  return dummyFiscales;
+  return data;
 };
 
-export const generateFiscalToken = async (/*fiscalID: string*/) => {
-  /*
+export const generateFiscalToken = async (fiscalID: string) => {
   const { data } = await axios.post<{ link: string }>(`/v1/fiscals/${fiscalID}/authorize`);
-  return data.link;*/
-  await new Promise((r) => setTimeout(r, 2000));
-  return 'https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep';
+  return data.link;
 };

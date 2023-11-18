@@ -1,30 +1,31 @@
 import { Button, Input, Pagination, Snippet, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@nextui-org/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Key, useCallback, useEffect, useMemo, useState } from 'react';
 import EditIcon from '../../assets/EditIcon';
-import { dummyFiscales } from './data';
 import { PlusIcon } from '../../assets/PlusIcon';
 import { SearchIcon } from '../../assets/SearchIcon';
 import { Fiscal, generateFiscalToken, getFiscales } from '../../services/fiscales';
+
+import { useEditFiscal } from '../../context/FiscalEditContext';
 
 const columns = [
   { name: 'Nombre', uid: 'fullName' },
   { name: 'Acciones', uid: 'actions' },
 ];
 
-interface FiscalWithLink extends Fiscal {
+export interface FiscalWithLink extends Fiscal {
   magicLink?: string;
 }
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { setFiscalToEdit } = useEditFiscal();
 
   const [fiscals, setFiscals] = useState<FiscalWithLink[]>([]);
   const [error, setError] = useState(false);
 
   const fetchFiscals = useCallback(async () => {
     try {
-      console.log('fechando');
       const fiscales = await getFiscales();
       setFiscals(fiscales);
     } catch (error) {
@@ -39,7 +40,7 @@ const Dashboard = () => {
   const onGenerateLink = useCallback(
     async (fiscalID: string) => {
       try {
-        const generatedLink = await generateFiscalToken(/*fiscalID*/);
+        const generatedLink = await generateFiscalToken(fiscalID);
         setFiscals((prev) => prev.map((f) => (f.id === fiscalID ? { ...f, magicLink: generatedLink } : f)));
       } catch (error) {
         console.log(error);
@@ -67,14 +68,16 @@ const Dashboard = () => {
               ) : (
                 <Button onClick={() => onGenerateLink(fiscal.id)}>Generar Link</Button>
               )}
-
-              <Link to={'/edit-fiscal'} className="text-black">
-                <Tooltip color="secondary" content="Editar Fiscal">
-                  <span className="text-xl text-default-400 cursor-pointer active:opacity-50">
-                    <EditIcon />
-                  </span>
-                </Tooltip>
-              </Link>
+              <Tooltip color="secondary" content="Editar Fiscal">
+                <span className="text-xl text-default-400 cursor-pointer active:opacity-50">
+                  <EditIcon
+                    onClick={() => {
+                      setFiscalToEdit(fiscal);
+                      navigate('/edit-fiscal');
+                    }}
+                  />
+                </span>
+              </Tooltip>
             </div>
           );
       }
@@ -136,7 +139,7 @@ const Dashboard = () => {
         </Button>
       </div>
     );
-  }, [filterValue, dummyFiscales.length, onSearchChange, hasSearchFilter]);
+  }, [filterValue, onSearchChange, hasSearchFilter]);
 
   return (
     <div>
