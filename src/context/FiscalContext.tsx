@@ -2,29 +2,29 @@ import { Key, ReactNode, createContext, useContext, useState } from 'react';
 import { CircuitoResponse, DistritoResponse } from '../services/mesas';
 
 type FiscalContextType = {
-  district: KeyOrNull;
-  setDistrict: React.Dispatch<React.SetStateAction<KeyOrNull>>;
+  district: KeyValueOrNull;
+  setDistrict: React.Dispatch<React.SetStateAction<KeyValueOrNull>>;
 
   electoralSections: IdValueNumber[];
   setElectoralSections: React.Dispatch<React.SetStateAction<IdValueNumber[]>>;
 
-  electoralSection: KeyOrNull;
-  setElectoralSection: React.Dispatch<React.SetStateAction<KeyOrNull>>;
+  electoralSection: KeyValueOrNull;
+  setElectoralSection: React.Dispatch<React.SetStateAction<KeyValueOrNull>>;
 
-  section: KeyOrNull;
-  setSection: React.Dispatch<React.SetStateAction<KeyOrNull>>;
+  section: KeyValueOrNull;
+  setSection: React.Dispatch<React.SetStateAction<KeyValueOrNull>>;
 
   sections: IdValueNumber[];
   setSections: React.Dispatch<React.SetStateAction<IdValueNumber[]>>;
 
-  circuit: KeyOrNull;
-  setCircuit: React.Dispatch<React.SetStateAction<KeyOrNull>>;
+  circuit: KeyValueOrNull;
+  setCircuit: React.Dispatch<React.SetStateAction<KeyValueOrNull>>;
 
   circuits: IdvalueString[];
   setCircuits: React.Dispatch<React.SetStateAction<IdvalueString[]>>;
 
-  establishment: KeyOrNull;
-  setEstablishment: React.Dispatch<React.SetStateAction<KeyOrNull>>;
+  establishment: KeyValueOrNull;
+  setEstablishment: React.Dispatch<React.SetStateAction<KeyValueOrNull>>;
 
   establishments: IdvalueString[];
   setEstablishments: React.Dispatch<React.SetStateAction<IdvalueString[]>>;
@@ -38,8 +38,7 @@ type FiscalContextType = {
   tables: IdvalueString[];
   setTables: React.Dispatch<React.SetStateAction<IdvalueString[]>>;
 };
-
-type KeyOrNull = Key | null;
+type KeyValueOrNull = { id: Key; value: string } | null;
 type IdValueNumber = { id: number; value: string };
 type IdvalueString = { id: string; value: string };
 
@@ -50,15 +49,15 @@ interface FiscalProviderProps {
 const FiscalContext = createContext<FiscalContextType | undefined>(undefined);
 
 export const FiscalProvider: React.FC<FiscalProviderProps> = ({ children }: any) => {
-  const [district, setDistrict] = useState<KeyOrNull>(null);
+  const [district, setDistrict] = useState<KeyValueOrNull>(null);
 
   const [electoralSections, setElectoralSections] = useState<IdValueNumber[]>([]);
-  const [electoralSection, setElectoralSection] = useState<KeyOrNull>(null);
-  const [section, setSection] = useState<KeyOrNull>(null);
+  const [electoralSection, setElectoralSection] = useState<KeyValueOrNull>(null);
+  const [section, setSection] = useState<KeyValueOrNull>(null);
   const [sections, setSections] = useState<IdValueNumber[]>([]);
-  const [circuit, setCircuit] = useState<KeyOrNull>(null);
+  const [circuit, setCircuit] = useState<KeyValueOrNull>(null);
   const [circuits, setCircuits] = useState<IdvalueString[]>([]);
-  const [establishment, setEstablishment] = useState<KeyOrNull>(null);
+  const [establishment, setEstablishment] = useState<KeyValueOrNull>(null);
   const [establishments, setEstablishments] = useState<IdvalueString[]>([]);
 
   const [distritoCompleteObject, setDistritoCompleteObject] = useState<DistritoResponse | null>(null);
