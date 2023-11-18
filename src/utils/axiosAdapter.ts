@@ -5,4 +5,9 @@ const axiosAdapter = axios.create({
   timeout: 5000,
 });
 
+export const staticDataAxios = axios.create({
+  baseURL: import.meta.env.STATIC_DATA_ENDPOINT,
+  timeout: 5000,
+});
+
 export default axiosAdapter;
