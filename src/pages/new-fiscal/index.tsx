@@ -119,6 +119,7 @@ const NewFiscal = () => {
       setElectoralSection((prev) => {
         const selectedElectoralSection = electoralSections.find((es) => es.id == electoralSectionID);
 
+        console.log(selectedElectoralSection)
         if (selectedElectoralSection) {
           if (selectedElectoralSection.value === null) {
             selectedElectoralSection.value = 'Primera';
@@ -309,14 +310,14 @@ const NewFiscal = () => {
                 isClearable={false}
                 isDisabled={!electoralSections.length}
                 defaultInputValue={electoralSection?.value}
-                defaultSelectedKey={String(electoralSection?.id)}
+                defaultSelectedKey={String(electoralSection?.id)  || 'Primera'}
                 onSelectionChange={electoralSectionOnSelectionChange}
                 defaultItems={electoralSections}
                 label="Seccion Electoral"
                 placeholder="Busca una SeccionElectoral"
                 className="max-w-sm"
               >
-                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value}</AutocompleteItem>}
+                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value ?? 'Primera'}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
                 isClearable={false}

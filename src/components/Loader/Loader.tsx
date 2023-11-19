@@ -1,4 +1,4 @@
-import logo from '../../../public/lla-min.svg';
+import logo from '../../../lla-min.svg';
 
 
 const Loader = () => {
