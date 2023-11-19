@@ -53,24 +53,8 @@ const NewFiscal = () => {
   const [loadingCircuitObject, setLoadingCircuitObject] = useState(false);
   const [fullName, setFullName] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [setNameValid, isNameValid] = useState(true);
+  const [setNameValid, isNameValid] = useState<boolean>(true);
 
-  // const handleSubmit = useCallback(
-  //   async (event: React.FormEvent) => {
-  //     event.preventDefault();
-  //     setError(false);
-  //     try {
-  //       await postFiscal({
-  //         fullName,
-  //         votingTables: tables.map((mesa) => mesa.id),
-  //       });
-  //       navigate('/dashboard');
-  //     } catch (error) {
-  //       setError(true);
-  //     }
-  //   },
-  //   [fullName, tables]
-  // );
   //Se refactoreó desde el callback porque propagaba el evento
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -406,7 +390,7 @@ const NewFiscal = () => {
               // Restablece el estado de validación al escribir en el campo
             }}
           />
-          {!isNameValid && <span className="text-red-500">Este campo es obligatorio.</span>}
+          {!setNameValid && <span className="text-red-500">Este campo es obligatorio.</span>}
           <div className="max-w-sm w-full pt-24">
             <Button type="button" color="secondary" className="w-full" onClick={handleSubmit}>
               Crear Fiscal

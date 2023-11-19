@@ -22,7 +22,6 @@ const Dashboard = () => {
   const { setFiscalToEdit } = useEditFiscal();
   const [loading, setLoading] = useState(true);
 
-
   const [fiscals, setFiscals] = useState<FiscalWithLink[]>([]);
   const [error, setError] = useState(false);
 
@@ -30,7 +29,7 @@ const Dashboard = () => {
     try {
       const fiscales = await getFiscales();
       setFiscals(fiscales);
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
       setError(true);
     }
@@ -135,7 +134,7 @@ const Dashboard = () => {
           value={filterValue}
           onClear={() => onClear()}
           onValueChange={onSearchChange}
-          />
+        />
 
         <Button onClick={() => navigate('/new-fiscal')} type="button" color="secondary" size="lg" endContent={<PlusIcon />}>
           Añadir Fiscal
@@ -143,9 +142,9 @@ const Dashboard = () => {
       </div>
     );
   }, [filterValue, onSearchChange, hasSearchFilter]);
-  
+
   return (
-    <div className='container'>
+    <div className="container">
       {loading ? ( // Check the loading state
         <Loader />
       ) : (
@@ -170,7 +169,6 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="p-4 lg:p-8 flex flex-col items-start justify-center">
-
             <Table aria-label="Example table with custom cells" topContent={topContent} topContentPlacement="outside">
               <TableHeader columns={columns}>
                 {(column) => (
@@ -186,11 +184,9 @@ const Dashboard = () => {
           </div>
           <div className="flex w-full justify-center pt-4">
             <Pagination isCompact showControls showShadow color="secondary" page={page} total={pages} onChange={(page) => setPage(page)} />
-
           </div>
         </>
       )}
-
     </div>
   );
 };
