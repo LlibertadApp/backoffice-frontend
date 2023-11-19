@@ -53,22 +53,37 @@ const NewFiscal = () => {
   const [loadingCircuitObject, setLoadingCircuitObject] = useState(false);
   const [fullName, setFullName] = useState('');
 
-  const handleSubmit = useCallback(
-    async (event: React.FormEvent) => {
-      event.preventDefault();
-      setError(false);
-      try {
-        await postFiscal({
-          fullName,
-          votingTables: tables.map((mesa) => mesa.id),
-        });
-        navigate('/dashboard');
-      } catch (error) {
-        setError(true);
-      }
-    },
-    [fullName, tables]
-  );
+  // const handleSubmit = useCallback(
+  //   async (event: React.FormEvent) => {
+  //     event.preventDefault();
+  //     setError(false);
+  //     try {
+  //       await postFiscal({
+  //         fullName,
+  //         votingTables: tables.map((mesa) => mesa.id),
+  //       });
+  //       navigate('/dashboard');
+  //     } catch (error) {
+  //       setError(true);
+  //     }
+  //   },
+  //   [fullName, tables]
+  // );
+  //Se refactoreó desde el callback porque propagaba el evento
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(false);
+    try {
+      await postFiscal({
+        fullName,
+        votingTables: tables.map((mesa) => mesa.id),
+      });
+      navigate('/dashboard');
+    } catch (error) {
+      setError(true);
+    }
+  };
+
 
   const districtOnSelectionChange = (distrito_id: Key) => {
     const selectedDistrictValue = distritos[distrito_id as distrito];
