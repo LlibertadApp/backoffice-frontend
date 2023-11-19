@@ -39,7 +39,13 @@ export interface Fiscal {
 
 export const getFiscales = async () => {
   const { data } = await axios.get<Fiscal[]>('/v1/fiscals');
-  return data;
+
+  // Ordenamos los fiscales por la fecha de creación
+  return data.sort((a, b) => {
+    const dateA = new Date(a.createdBy);
+    const dateB = new Date(b.createdBy);
+    return dateB.getTime() - dateA.getTime();
+  });
 };
 
 export const generateFiscalToken = async (fiscalID: string) => {
