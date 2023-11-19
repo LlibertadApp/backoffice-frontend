@@ -303,7 +303,7 @@ const EditarFiscal = () => {
                 placeholder="Busca una SeccionElectoral"
                 className="max-w-sm"
               >
-                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value}</AutocompleteItem>}
+                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value ?? 'Primera'}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
                 inputValue={section?.value}
@@ -314,7 +314,7 @@ const EditarFiscal = () => {
                 placeholder="Busca una Seccion"
                 className="max-w-sm"
               >
-                {(section) => <AutocompleteItem key={section.id}>{section.value}</AutocompleteItem>}
+                {(section) => <AutocompleteItem key={section.id}>{section.value ?? 'Primera'}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
                 inputValue={circuit?.value}
@@ -325,7 +325,7 @@ const EditarFiscal = () => {
                 placeholder="Busca un Circuito"
                 className="max-w-sm"
               >
-                {(circuit) => <AutocompleteItem key={circuit.id}>{circuit.value}</AutocompleteItem>}
+                {(circuit) => <AutocompleteItem key={circuit.id}>{circuit.value ?? 'Primera'}</AutocompleteItem>}
               </Autocomplete>
               {!loadingCircuitObject ? (
                 <Autocomplete
@@ -337,7 +337,7 @@ const EditarFiscal = () => {
                   placeholder="Busca un Establecimiento"
                   className="max-w-sm"
                 >
-                  {(establishment) => <AutocompleteItem key={establishment.id}>{establishment.value}</AutocompleteItem>}
+                  {(establishment) => <AutocompleteItem key={establishment.id}>{establishment.value ?? 'Primera'}</AutocompleteItem>}
                 </Autocomplete>
               ) : (
                 <CircularProgress aria-label="Loading..." />
