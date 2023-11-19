@@ -52,23 +52,30 @@ const NewFiscal = () => {
   const [loadingDistritoObject, setLoadingDistritoObject] = useState(false);
   const [loadingCircuitObject, setLoadingCircuitObject] = useState(false);
   const [fullName, setFullName] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [setNameValid, isNameValid] = useState<boolean>(true);
 
-  const handleSubmit = useCallback(
-    async (event: React.FormEvent) => {
-      event.preventDefault();
-      setError(false);
-      try {
-        await postFiscal({
-          fullName,
-          votingTables: tables.map((mesa) => mesa.id),
-        });
-        navigate('/dashboard');
-      } catch (error) {
-        setError(true);
-      }
-    },
-    [fullName, tables]
-  );
+  //Se refactoreó desde el callback porque propagaba el evento
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!fullName.trim()) {
+      isNameValid(false);
+      return;
+    }
+
+    isNameValid(true);
+    setError(false);
+    try {
+      await postFiscal({
+        fullName,
+        votingTables: tables.map((mesa) => mesa.id),
+      });
+      navigate('/dashboard');
+    } catch (error) {
+      setError(true);
+    }
+  };
 
   const districtOnSelectionChange = (distrito_id: Key) => {
     const selectedDistrictValue = distritos[distrito_id as distrito];
@@ -112,6 +119,7 @@ const NewFiscal = () => {
       setElectoralSection((prev) => {
         const selectedElectoralSection = electoralSections.find((es) => es.id == electoralSectionID);
 
+        console.log(selectedElectoralSection)
         if (selectedElectoralSection) {
           if (selectedElectoralSection.value === null) {
             selectedElectoralSection.value = 'Primera';
@@ -286,6 +294,7 @@ const NewFiscal = () => {
 
           <Autocomplete
             value={district?.value ?? ''}
+            isClearable={false}
             selectedKey={String(district?.id)}
             onSelectionChange={districtOnSelectionChange}
             defaultItems={Object.entries(distritos).map(([key, value]) => ({ id: key, value }))}
@@ -298,17 +307,21 @@ const NewFiscal = () => {
           {!loadingDistritoObject ? (
             <>
               <Autocomplete
+                isClearable={false}
+                isDisabled={!electoralSections.length}
                 defaultInputValue={electoralSection?.value}
-                defaultSelectedKey={String(electoralSection?.id)}
+                defaultSelectedKey={String(electoralSection?.id)  || 'Primera'}
                 onSelectionChange={electoralSectionOnSelectionChange}
                 defaultItems={electoralSections}
                 label="Seccion Electoral"
                 placeholder="Busca una SeccionElectoral"
                 className="max-w-sm"
               >
-                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value}</AutocompleteItem>}
+                {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value ?? 'Primera'}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
+                isClearable={false}
+                isDisabled={!sections.length}
                 defaultInputValue={section?.value}
                 defaultSelectedKey={String(section?.id)}
                 onSelectionChange={sectionOnSelectionChange}
@@ -320,6 +333,8 @@ const NewFiscal = () => {
                 {(section) => <AutocompleteItem key={section.id}>{section.value}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
+                isClearable={false}
+                isDisabled={!circuits.length}
                 defaultInputValue={circuit?.value}
                 defaultSelectedKey={String(circuit?.id)}
                 onSelectionChange={circuitOnSelectionChange}
@@ -332,6 +347,8 @@ const NewFiscal = () => {
               </Autocomplete>
               {!loadingCircuitObject ? (
                 <Autocomplete
+                  isClearable={false}
+                  isDisabled={!establishments.length}
                   defaultInputValue={establishment?.value}
                   defaultSelectedKey={String(establishment?.id)}
                   onSelectionChange={establishmentOnSelectionChange}
@@ -361,7 +378,6 @@ const NewFiscal = () => {
             </div>
           ) : null}
         </div>
-
         <div className="w-120 flex flex-col gap-4 pt-8 items-center">
           <span className="text-lg font-bold">Datos del Fiscal</span>
           <Input
@@ -370,14 +386,20 @@ const NewFiscal = () => {
             label="Nombre Completo"
             className="max-w-sm"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e) => {
+              setFullName(e.target.value);
+              // Restablece el estado de validación al escribir en el campo
+            }}
           />
+          {!setNameValid && <span className="text-red-500">Este campo es obligatorio.</span>}
           <div className="max-w-sm w-full pt-24">
             <Button type="button" color="secondary" className="w-full" onClick={handleSubmit}>
               Crear Fiscal
             </Button>
           </div>
         </div>
+
+        {/* Cierre del fragmento principal */}
       </div>
     </div>
   );
