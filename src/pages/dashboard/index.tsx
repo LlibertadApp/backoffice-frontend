@@ -113,7 +113,7 @@ const Dashboard = () => {
   }, []);
 
   const [page, setPage] = useState(1);
-  const rowsPerPage = 9;
+  const rowsPerPage = 10;
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
   const items = useMemo(() => {

@@ -282,6 +282,7 @@ const EditarFiscal = () => {
           <span className="text-lg font-bold pt-4">Datos Electorales</span>
 
           <Autocomplete
+            
             value={district?.value ?? ''}
             selectedKey={String(district?.id)}
             onSelectionChange={districtOnSelectionChange}
@@ -300,7 +301,7 @@ const EditarFiscal = () => {
                 onSelectionChange={electoralSectionOnSelectionChange}
                 defaultItems={electoralSections}
                 label="Seccion Electoral"
-                placeholder="Busca una SeccionElectoral"
+                placeholder="Busca una Seccion electoral"
                 className="max-w-sm"
               >
                 {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value}</AutocompleteItem>}

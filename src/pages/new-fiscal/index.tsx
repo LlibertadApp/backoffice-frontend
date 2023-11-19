@@ -52,6 +52,8 @@ const NewFiscal = () => {
   const [loadingDistritoObject, setLoadingDistritoObject] = useState(false);
   const [loadingCircuitObject, setLoadingCircuitObject] = useState(false);
   const [fullName, setFullName] = useState('');
+  const [setNameValid, isNameValid] = useState(true)
+
 
   // const handleSubmit = useCallback(
   //   async (event: React.FormEvent) => {
@@ -72,6 +74,13 @@ const NewFiscal = () => {
   //Se refactoreó desde el callback porque propagaba el evento
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    
+    if(!fullName.trim()){
+      isNameValid(false);
+      return;
+    }
+
+    isNameValid(true);
     setError(false);
     try {
       await postFiscal({
@@ -301,6 +310,7 @@ const NewFiscal = () => {
 
           <Autocomplete
             value={district?.value ?? ''}
+            isClearable={false}
             selectedKey={String(district?.id)}
             onSelectionChange={districtOnSelectionChange}
             defaultItems={Object.entries(distritos).map(([key, value]) => ({ id: key, value }))}
@@ -313,6 +323,7 @@ const NewFiscal = () => {
           {!loadingDistritoObject ? (
             <>
               <Autocomplete
+                isClearable={false}
                 defaultInputValue={electoralSection?.value}
                 defaultSelectedKey={String(electoralSection?.id)}
                 onSelectionChange={electoralSectionOnSelectionChange}
@@ -324,6 +335,7 @@ const NewFiscal = () => {
                 {(electoralSection) => <AutocompleteItem key={electoralSection.id}>{electoralSection.value}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
+                isClearable={false}
                 defaultInputValue={section?.value}
                 defaultSelectedKey={String(section?.id)}
                 onSelectionChange={sectionOnSelectionChange}
@@ -335,6 +347,7 @@ const NewFiscal = () => {
                 {(section) => <AutocompleteItem key={section.id}>{section.value}</AutocompleteItem>}
               </Autocomplete>
               <Autocomplete
+                isClearable={false}
                 defaultInputValue={circuit?.value}
                 defaultSelectedKey={String(circuit?.id)}
                 onSelectionChange={circuitOnSelectionChange}
@@ -347,6 +360,7 @@ const NewFiscal = () => {
               </Autocomplete>
               {!loadingCircuitObject ? (
                 <Autocomplete
+                  isClearable={false}
                   defaultInputValue={establishment?.value}
                   defaultSelectedKey={String(establishment?.id)}
                   onSelectionChange={establishmentOnSelectionChange}
@@ -376,26 +390,31 @@ const NewFiscal = () => {
             </div>
           ) : null}
         </div>
-
         <div className="w-120 flex flex-col gap-4 pt-8 items-center">
           <span className="text-lg font-bold">Datos del Fiscal</span>
-          <Input
-            color="default"
-            type="text"
-            label="Nombre Completo"
-            className="max-w-sm"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-          <div className="max-w-sm w-full pt-24">
-            <Button type="button" color="secondary" className="w-full" onClick={handleSubmit}>
-              Crear Fiscal
-            </Button>
-          </div>
+      <Input
+        color="default"
+        type="text"
+        label="Nombre Completo"
+        className="max-w-sm"
+        value={fullName}
+        onChange={(e) => {
+          setFullName(e.target.value);
+          // Restablece el estado de validación al escribir en el campo
+        }}
+      />
+      {!isNameValid && <span className="text-red-500">Este campo es obligatorio.</span>}
+      <div className="max-w-sm w-full pt-24">
+        <Button type="button" color="secondary" className="w-full" onClick={handleSubmit}>
+          Crear Fiscal
+        </Button>
+      </div>
         </div>
+
+        {/* Cierre del fragmento principal */}
       </div>
     </div>
-  );
-};
+      );
+    };
 
 export default NewFiscal;
