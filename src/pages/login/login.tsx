@@ -6,7 +6,7 @@ import { ILoginProps } from './types';
 import { useAuth } from '../../context/AuthContext';
 
 export const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, isLoading, error } = useAuth();
 
   const validationSchema = yup.object({
     email: yup.string().email('Email inválido').required('Campo requerido'),
@@ -30,8 +30,15 @@ export const LoginPage = () => {
         Entre todos, <br />
         <strong className="text-violet-brand font-semibold break-words">evitemos el fraude.</strong>
       </h1>
+      {error && (
+        <span className="w-full p-3 border border-red-600 bg-red-600/10 rounded-md mt-10">
+          Ocurrió un error al iniciar sesión
+          <br />
+          Por favor intentalo de nuevo.
+        </span>
+      )}
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onLogin}>
-        <Form className="w-full mt-16 flex flex-col gap-8">
+        <Form className="w-full mt-6 flex flex-col gap-8">
           <div className="flex flex-col mb-4 relative">
             <label htmlFor="email" className="text-sm font-medium text-gray-400">
               Correo Electrónico
@@ -46,7 +53,7 @@ export const LoginPage = () => {
             <Field type="password" id="password" name="password" className="mt-1 p-2 border rounded-md" />
             <ErrorMessage name="password" component="p" className="absolute -mt-[152px] text-red-500 text-sm pt-4 top-52" />
           </div>
-          <Button type="submit" className="bg-[#646cff]">
+          <Button isLoading={isLoading} type="submit" className="bg-[#646cff]">
             Ingresar
           </Button>
         </Form>

@@ -7,6 +7,8 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   token: string | null;
   user: string | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
 interface AuthProviderProps {
@@ -20,9 +22,12 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: any) => {
   const [token, setToken] = useState(authToken);
   const [user, setUser] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const login = async (username: string, password: string) => {
     try {
+      setIsLoading(true);
       const {
         data: { token },
       } = await axios.post('v1/auth/login', {
@@ -35,7 +40,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: any) => 
         setUser(username);
       }
     } catch (error) {
+      setError(JSON.stringify(error));
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -55,7 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: any) => 
     }
   }, [token]);
 
-  return <AuthContext.Provider value={{ token, user, login }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ token, user, login, isLoading, error }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
